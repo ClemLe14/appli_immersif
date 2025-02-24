@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Évaluation de l'Environnement Immersif</title>
+    <style>
+        body {
+            background-color: orange;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        textarea {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            height: 150px;
+        }
+        button {
+            background: #333;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+        .choice {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .choice div {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            width: 45%;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            font-size: 1.2em;
+        }
+        .choice img {
+            width: 70px;
+            height: 70px;
+            margin-bottom: 10px;
+        }
+        .checked {
+            background: lightgreen !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="emailSection">
+        <h2>Entrez votre email pour commencer</h2>
+        <input type="email" id="userEmail" placeholder="Entrez votre email ici...">
+        <button onclick="saveEmail()">Commencer</button>
+    </div>
+    
+    <div class="container hidden" id="selection">
+        <h2>Choisissez votre évaluation</h2>
+        <div class="choice">
+            <div id="facteurs-choice" onclick="startPage('page1', 'facteurs-choice')">
+                <img src="casque.png" alt="Facteurs">
+                <span>Facteurs</span>
+            </div>
+            <div id="composantes-choice" onclick="startPage('page2', 'composantes-choice')">
+                <img src="cerveau.png" alt="Composantes">
+                <span>Composantes</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container hidden" id="page1">
+        <h2>Évaluation des Facteurs de l'Environnement Immersif</h2>
+        <label for="q1">Facteurs technologiques :</label>
+        <textarea id="q1" placeholder="Tapez ici..." oninput="showNext(1, 'q2')"></textarea>
+        
+        <label for="q2" class="hidden">Facteurs environnementaux :</label>
+        <textarea id="q2" placeholder="Tapez ici..." class="hidden" oninput="showNext(2, 'q3')"></textarea>
+        
+        <label for="q3" class="hidden">Facteurs individuels :</label>
+        <textarea id="q3" placeholder="Tapez ici..." class="hidden" oninput="showNext(3, 'returnToMenu')"></textarea>
+        
+        <button id="returnToMenu" class="hidden" onclick="returnToMenu('facteurs-choice')">Retour au menu</button>
+    </div>
+    
+    <div class="container hidden" id="page2">
+        <h2>Évaluation des Composantes de l'Environnement Immersif</h2>
+        <label for="q4">Présence de soi :</label>
+        <textarea id="q4" placeholder="Tapez ici..." oninput="showNext(4, 'q5')"></textarea>
+        
+        <label for="q5" class="hidden">Modèle mental :</label>
+        <textarea id="q5" placeholder="Tapez ici..." class="hidden" oninput="showNext(5, 'q6')"></textarea>
+        
+        <label for="q6" class="hidden">Émotion :</label>
+        <textarea id="q6" placeholder="Tapez ici..." class="hidden" oninput="showNext(6, 'q7')"></textarea>
+        
+        <label for="q7" class="hidden">Jugement :</label>
+        <textarea id="q7" placeholder="Tapez ici..." class="hidden" oninput="showNext(7, 'q8')"></textarea>
+        
+        <label for="q8" class="hidden">Implication :</label>
+        <textarea id="q8" placeholder="Tapez ici..." class="hidden" oninput="showNext(8, 'q9')"></textarea>
+        
+        <label for="q9" class="hidden">Suspension de l'incrédulité :</label>
+        <textarea id="q9" placeholder="Tapez ici..." class="hidden" oninput="showNext(9, 'returnToMenuComp')"></textarea>
+        
+        <button id="returnToMenuComp" class="hidden" onclick="returnToMenu('composantes-choice')">Retour au menu</button>
+    </div>
+    
+    <script>
+        function saveEmail() {
+            const email = document.getElementById("userEmail").value;
+            if (email.trim() !== "") {
+                localStorage.setItem("userEmail", email);
+                document.getElementById("emailSection").classList.add("hidden");
+                document.getElementById("selection").classList.remove("hidden");
+            }
+        }
+        
+        function showNext(current, nextId) {
+            let currentInput = document.getElementById(`q${current}`);
+            if (currentInput.value.trim() !== "") {
+                document.getElementById(nextId).classList.remove("hidden");
+                let label = document.querySelector(`label[for='${nextId}']`);
+                if (label) label.classList.remove("hidden");
+            }
+        }
+        
+        function startPage(pageId, choiceId) {
+            document.getElementById("selection").classList.add("hidden");
+            document.getElementById(pageId).classList.remove("hidden");
+        }
+        
+        function returnToMenu(choiceId) {
+            document.getElementById("page1").classList.add("hidden");
+            document.getElementById("page2").classList.add("hidden");
+            document.getElementById("selection").classList.remove("hidden");
+            document.getElementById(choiceId).classList.add("checked");
+        }
+    </script>
+</body>
+</html>
