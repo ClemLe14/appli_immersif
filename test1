@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Évaluation de l'Environnement Immersif</title>
+    <style>
+        body {
+            background-color: orange;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        textarea {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            height: 100px;
+        }
+        button {
+            background: #333;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+        .disabled {
+            background: gray;
+            cursor: not-allowed;
+        }
+        .step-button {
+            display: block;
+            width: 90%;
+            padding: 15px;
+            margin: 10px auto;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="emailSection">
+        <h2>Entrez votre email pour commencer</h2>
+        <input type="email" id="userEmail" placeholder="Entrez votre email ici...">
+        <button onclick="saveEmail()">Commencer</button>
+    </div>
+    
+    <div class="container hidden" id="steps">
+        <h2>Bienvenue dans l'application</h2>
+        <p>Voici les différentes étapes de l'atelier :</p>
+        <button class="step-button" id="step1-btn" onclick="showStep('step1')">Étape 1 : Analyse Critique</button>
+        <button class="step-button disabled" id="step2-btn" onclick="showStep('step2')" disabled>Étape 2 : Non débloquée</button>
+        <button class="step-button disabled" id="step3-btn" onclick="showStep('step3')" disabled>Étape 3 : Non débloquée</button>
+    </div>
+    
+    <div class="container hidden" id="step1">
+        <h3>Analyse critique des composantes de sentiment de présence</h3>
+        <div id="questions">
+            <div class="question" id="question1">
+                <p>Présence de soi :</p>
+                <label><input type="radio" name="presence" value="oui"> Oui</label>
+                <label><input type="radio" name="presence" value="non"> Non</label>
+                <p>Pourquoi ?</p>
+                <textarea id="presenceWhy" oninput="checkAndShowNext(1, 2); saveResponses()"></textarea>
+            </div>
+            <div class="question hidden" id="question2">
+                <p>Modèle mental :</p>
+                <label><input type="radio" name="model" value="oui"> Oui</label>
+                <label><input type="radio" name="model" value="non"> Non</label>
+                <p>Pourquoi ?</p>
+                <textarea id="modelWhy" oninput="checkAndShowNext(2, 3); saveResponses()"></textarea>
+            </div>
+            <div class="question hidden" id="question3">
+                <p>Émotion :</p>
+                <label><input type="radio" name="emotion" value="oui"> Oui</label>
+                <label><input type="radio" name="emotion" value="non"> Non</label>
+                <p>Pourquoi ?</p>
+                <textarea id="emotionWhy" oninput="checkAndShowNext(3, 4); saveResponses()"></textarea>
+            </div>
+            <div class="question hidden" id="question4">
+                <p>Jugement :</p>
+                <label><input type="radio" name="judgement" value="oui"> Oui</label>
+                <label><input type="radio" name="judgement" value="non"> Non</label>
+                <p>Pourquoi ?</p>
+                <textarea id="judgementWhy" oninput="checkAndShowNext(4, 5); saveResponses()"></textarea>
+            </div>
+            <div class="question hidden" id="question5">
+                <p>Implication :</p>
+                <label><input type="radio" name="implication" value="oui"> Oui</label>
+                <label><input type="radio" name="implication" value="non"> Non</label>
+                <p>Pourquoi ?</p>
+                <textarea id="implicationWhy" oninput="checkAndShowNext(5, 6); saveResponses()"></textarea>
+            </div>
+            <div class="question hidden" id="question6">
+                <p>Suspension de l'incrédulité :</p>
+                <label><input type="radio" name="suspension" value="oui"> Oui</label>
+                <label><input type="radio" name="suspension" value="non"> Non</label>
+                <p>Pourquoi ?</p>
+                <textarea id="suspensionWhy" oninput="enableStep2(); saveResponses()"></textarea>
+                <button class="hidden" id="saveBtn" onclick="saveResponses()">Enregistrer</button>
+                <button class="hidden" id="backBtn" onclick="showStep('steps')">Revenir aux étapes</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function saveEmail() {
+            document.getElementById("emailSection").classList.add("hidden");
+            document.getElementById("steps").classList.remove("hidden");
+        }
+        
+        function checkAndShowNext(currentId, nextId) {
+            let currentTextarea = document.getElementById(`question${currentId}`).querySelector("textarea");
+            if (currentTextarea && currentTextarea.value.trim() !== "") {
+                document.getElementById(`question${nextId}`).classList.remove("hidden");
+            }
+        }
+
+        function enableStep2() {
+            document.getElementById("saveBtn").classList.remove("hidden");
+            document.getElementById("backBtn").classList.remove("hidden");
+            let step2Btn = document.getElementById("step2-btn");
+            step2Btn.classList.remove("disabled");
+            step2Btn.disabled = false;
+            step2Btn.innerText = "Étape 2 : Facteurs à modifier";
+        }
+
+        function showStep(step) {
+            document.querySelectorAll(".container").forEach(el => el.classList.add("hidden"));
+            document.getElementById(step).classList.remove("hidden");
+        }
+    </script>
+</body>
+</html>
