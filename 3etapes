@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Évaluation de l'Environnement Immersif</title>
+  <style>
+    body {
+      background-color: orange;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 800px;
+      margin: 20px auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 1;
+    }
+    h2, h3, h4 {
+      margin-top: 0;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .disabled {
+      background: gray !important;
+      cursor: not-allowed !important;
+    }
+    .done {
+      background: green !important;
+      cursor: pointer;
+    }
+    button {
+      background: #333;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    .step-button {
+      display: block;
+      width: 90%;
+      padding: 15px;
+      margin: 10px auto;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    input[type="email"] {
+      width: 80%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    textarea {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      min-height: 60px;
+      background: #fafafa;
+    }
+
+    /* Sous-menu (Étape 2) */
+    .sub-menu {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .sub-menu button {
+      font-size: 18px;
+      padding: 15px 25px;
+      border-radius: 8px;
+    }
+
+    /* Facteurs (Étape 2 - Module 1) */
+    .factor-block {
+      background: #fefefe;
+      border-radius: 8px;
+      margin: 20px 0;
+      padding: 15px;
+      box-shadow: 0 0 3px rgba(0,0,0,0.1);
+      text-align: left;
+      position: relative;
+    }
+    .cards-zone {
+      margin: 10px auto;
+      padding: 10px;
+      min-height: 10px;
+      text-align: left;
+    }
+    .card-container {
+      margin: 10px 0;
+      border: 1px solid #eee;
+      border-radius: 5px;
+      padding: 10px;
+      position: relative;
+      background: #ececec;
+    }
+    .remove-card {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      color: red;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .drop-zone {
+      margin: 10px auto;
+      width: 220px;
+      height: 60px;
+      border: 2px dashed #999;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f9f9f9;
+      transition: border-color 0.2s;
+    }
+    .drop-zone span {
+      color: #888;
+    }
+    .drop-zone.filled {
+      border: 2px solid #4caf50;
+      background-color: #eaffea;
+      color: black;
+    }
+
+    /* Module 2 : Correction (Étape 2) */
+    .revealed-content {
+      background-color: #eee;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-top: 10px;
+      padding: 10px;
+      text-align: left;
+    }
+    .purple-card {
+      background-color: #c49ee6;
+      color: #fff;
+      font-weight: bold;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    /* Petit "i" => tooltip en CSS (rouge, cerclé) */
+    .info-icon-container {
+      display: inline-block;
+      position: relative;
+      margin-left: 8px;
+      cursor: pointer;
+    }
+    .info-icon {
+      background: red;
+      color: #fff;
+      font-weight: bold;
+      border-radius: 50%;
+      padding: 2px 6px;
+      border: 2px solid #fff;
+      font-size: 12px;
+    }
+    .info-icon-container .tooltip-text {
+      visibility: hidden;
+      width: 280px;
+      background-color: #333;
+      color: #fff;
+      text-align: left;
+      border-radius: 5px;
+      padding: 8px;
+      position: absolute;
+      top: 25px;
+      left: -70px;
+      z-index: 999;
+      font-size: 14px;
+
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .info-icon-container:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Cartes vertes (Module 1, dimension réduite) */
+    .tags-panel {
+      position: fixed;
+      top: 120px;
+      right: 0;
+      width: 120px;
+      background: #4caf50;
+      border-top-left-radius: 10px;
+      border-bottom-left-radius: 10px;
+      padding: 10px 5px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    .playing-card {
+      width: 120px; 
+      height: 80px;  
+      background: #98ee99;
+      border-radius: 8px;
+      cursor: grab;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      position: relative;
+      transition: all 0.3s;
+      text-align: left;
+      color: #085400;
+      overflow: hidden;
+    }
+    .playing-card:hover {
+      width: 220px;
+      height: 160px;
+    }
+    .card-title {
+      font-weight: bold;
+      font-size: 14px;
+      margin: 6px;
+      color: #085400;
+    }
+    .card-body {
+      display: none;
+      padding: 0 6px 6px 6px;
+      font-size: 12px;
+    }
+    .playing-card:hover .card-body {
+      display: block;
+    }
+
+    /* ÉTAPE 3 : Gros encadré violet */
+    .big-violet-box {
+      background-color: purple;
+      color: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 30px auto;
+      width: 90%;
+      max-width: 600px;
+      text-align: center;
+      position: relative;
+    }
+    .idea-card {
+      background-color: #9951c4; /* un violet un peu différent */
+      border-radius: 8px;
+      color: #fff;
+      font-weight: bold;
+      padding: 10px;
+      width: 180px;
+      margin: 10px auto;
+      cursor: pointer;
+    }
+    .idea-hidden {
+      display: none;
+      margin-top: 10px;
+      background: #fff;
+      color: #333;
+      border-radius: 5px;
+      padding: 10px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1) PAGE D'ACCUEIL EMAIL -->
+  <div class="container" id="emailSection">
+    <h2>Entrez votre email pour commencer</h2>
+    <input type="email" id="userEmail" placeholder="Entrez votre email ici..." />
+    <button onclick="saveEmail()">Commencer</button>
+  </div>
+
+  <!-- 2) MENU ÉTAPES (Étape 3 n'est plus disabled) -->
+  <div class="container hidden" id="steps">
+    <h2>Bienvenue dans l'application</h2>
+    <p>Voici les différentes étapes de l'atelier :</p>
+    <button class="step-button disabled" id="step1-btn" onclick="showStep('step1')">Étape 1 : Analyse Critique</button>
+    <button class="step-button disabled" id="step2-btn" onclick="showStep('step2')" disabled>Étape 2 : Non débloquée</button>
+    <button class="step-button" id="step3-btn" onclick="showStep('step3')">Étape 3 : Récap</button>
+  </div>
+
+  <!-- 3) ÉTAPE 1 (INCHANGÉ) -->
+  <div class="container hidden" id="step1">
+    <h3>Analyse critique des composantes de sentiment de présence</h3>
+    <p style="text-align: left;">
+      <strong>Qu'avez-vous ressenti pendant que vous étiez exposé à l'environnement immersif ?</strong><br/>
+      Pour chaque composante, indiquez si oui ou non vous l'avez ressentie.  
+      Puis, que vous l'ayez ressentie ou non, décrivez pourquoi en quelques phrases.
+    </p>
+
+    <!-- 6 questions -->
+    <div id="questions">
+      <!-- 1. Présence -->
+      <div class="question" id="question1">
+        <p><strong>Présence de soi :</strong></p>
+        <label><input type="radio" name="presence" value="oui" onclick="saveResponses()"> Oui</label>
+        <label><input type="radio" name="presence" value="non" onclick="saveResponses()"> Non</label>
+        <p>Pourquoi ?</p>
+        <textarea id="presenceWhy" oninput="checkAndShowNext(1, 2); saveResponses()"></textarea>
+      </div>
+      <!-- 2. Modèle mental -->
+      <div class="question hidden" id="question2">
+        <p><strong>Modèle mental :</strong></p>
+        <label><input type="radio" name="model" value="oui" onclick="saveResponses()"> Oui</label>
+        <label><input type="radio" name="model" value="non" onclick="saveResponses()"> Non</label>
+        <p>Pourquoi ?</p>
+        <textarea id="modelWhy" oninput="checkAndShowNext(2, 3); saveResponses()"></textarea>
+      </div>
+      <!-- 3. Émotion -->
+      <div class="question hidden" id="question3">
+        <p><strong>Émotion :</strong></p>
+        <label><input type="radio" name="emotion" value="oui" onclick="saveResponses()"> Oui</label>
+        <label><input type="radio" name="emotion" value="non" onclick="saveResponses()"> Non</label>
+        <p>Pourquoi ?</p>
+        <textarea id="emotionWhy" oninput="checkAndShowNext(3, 4); saveResponses()"></textarea>
+      </div>
+      <!-- 4. Jugement -->
+      <div class="question hidden" id="question4">
+        <p><strong>Jugement :</strong></p>
+        <label><input type="radio" name="judgement" value="oui" onclick="saveResponses()"> Oui</label>
+        <label><input type="radio" name="judgement" value="non" onclick="saveResponses()"> Non</label>
+        <p>Pourquoi ?</p>
+        <textarea id="judgementWhy" oninput="checkAndShowNext(4, 5); saveResponses()"></textarea>
+      </div>
+      <!-- 5. Implication -->
+      <div class="question hidden" id="question5">
+        <p><strong>Implication :</strong></p>
+        <label><input type="radio" name="implication" value="oui" onclick="saveResponses()"> Oui</label>
+        <label><input type="radio" name="implication" value="non" onclick="saveResponses()"> Non</label>
+        <p>Pourquoi ?</p>
+        <textarea id="implicationWhy" oninput="checkAndShowNext(5, 6); saveResponses()"></textarea>
+      </div>
+      <!-- 6. Suspension -->
+      <div class="question hidden" id="question6">
+        <p><strong>Suspension de l'incrédulité :</strong></p>
+        <label><input type="radio" name="suspension" value="oui" onclick="saveResponses()"> Oui</label>
+        <label><input type="radio" name="suspension" value="non" onclick="saveResponses()"> Non</label>
+        <p>Pourquoi ?</p>
+        <textarea id="suspensionWhy" oninput="enableStep2(); saveResponses()"></textarea>
+
+        <button class="hidden" id="saveBtn" onclick="saveResponses(); showStep('steps')">
+          Enregistrer et revenir au menu
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4) ÉTAPE 2 (INCHANGÉ) -->
+  <div class="container hidden" id="step2">
+    <h2>Étape 2 : Facteurs à modifier</h2>
+    <div class="sub-menu">
+      <button id="module1-btn" class="disabled" disabled onclick="showModule('module1')">Facteurs</button>
+      <button id="module2-btn" class="disabled" disabled onclick="showModule('module2')">Correction</button>
+    </div>
+
+    <!-- MODULE 1 : Facteurs -->
+    <div id="module1" class="hidden">
+      <h3>Facteurs</h3>
+      <p style="text-align: left; font-weight:bold;">
+        Pour chacun des facteurs, décrivez vos impressions, indiquez ce qui pourrait être amélioré 
+        et sur quelle(s) composante(s) cela aurait un impact.
+      </p>
+      <!-- Facteur 1 -->
+      <div class="factor-block" id="factor1">
+        <h4>
+          Facteur 1 : Technologique
+          <span class="info-icon-container">
+            <span class="info-icon">i</span>
+            <span class="tooltip-text">
+              Les facteurs technologiques renvoient à tout ce qui concerne le matériel, 
+              l’immersion (forme du média, enveloppement sensoriel...) 
+              et l’interaction (aspect naturel, contrôle, interface...).
+            </span>
+          </span>
+        </h4>
+        <div>
+          <p><strong>Quel est votre ressenti ?</strong></p>
+          <textarea id="facteur1_ressenti" oninput="checkFactorCompletion(1); saveResponses()"></textarea>
+        </div>
+        <div>
+          <p><strong>Qu'est-ce qu'on pourrait améliorer ?</strong></p>
+          <textarea id="facteur1_ameliorer" oninput="checkFactorCompletion(1); saveResponses()"></textarea>
+        </div>
+        <div>
+          <p><strong>Quelle(s) composante(s) pourraient être impactées ?</strong></p>
+          <p>Choisissez l'une des <span style="color:green;">cartes vertes</span> (à droite)...</p>
+          <div class="cards-zone" id="factor1-cards">
+            <div class="card-container">
+              <div class="remove-card" onclick="removeCard(this)">x</div>
+              <div class="drop-zone" ondragover="onDragOver(event)" ondrop="onDrop(event, 1)" data-value="">
+                <span>Glissez une composante ici</span>
+              </div>
+              <p><strong>Commentaire :</strong></p>
+              <textarea class="commentaire" oninput="checkFactorCompletion(1); saveResponses()"></textarea>
+            </div>
+          </div>
+          <button onclick="addCard('factor1-cards', 1)">+ Ajouter un encadré</button>
+        </div>
+      </div>
+
+      <!-- Facteur 2 -->
+      <div class="factor-block hidden" id="factor2">
+        <h4>
+          Facteur 2 : Environnemental
+          <span class="info-icon-container">
+            <span class="info-icon">i</span>
+            <span class="tooltip-text">
+              Les facteurs environnementaux renvoient à la cohérence/réalisme de l’environnement, 
+              la narration, la nature de la tâche, etc.
+            </span>
+          </span>
+        </h4>
+        <div>
+          <p><strong>Quel est votre ressenti ?</strong></p>
+          <textarea id="facteur2_ressenti" oninput="checkFactorCompletion(2); saveResponses()"></textarea>
+        </div>
+        <div>
+          <p><strong>Qu'est-ce qu'on pourrait améliorer ?</strong></p>
+          <textarea id="facteur2_ameliorer" oninput="checkFactorCompletion(2); saveResponses()"></textarea>
+        </div>
+        <div>
+          <p><strong>Quelle(s) composante(s) pourraient être impactées ?</strong></p>
+          <p>Choisissez l'une des <span style="color:green;">cartes vertes</span> (à droite)...</p>
+          <div class="cards-zone" id="factor2-cards">
+            <div class="card-container">
+              <div class="remove-card" onclick="removeCard(this)">x</div>
+              <div class="drop-zone" ondragover="onDragOver(event)" ondrop="onDrop(event, 2)" data-value="">
+                <span>Glissez une composante ici</span>
+              </div>
+              <p><strong>Commentaire :</strong></p>
+              <textarea class="commentaire" oninput="checkFactorCompletion(2); saveResponses()"></textarea>
+            </div>
+          </div>
+          <button onclick="addCard('factor2-cards', 2)">+ Ajouter un encadré</button>
+        </div>
+      </div>
+
+      <!-- Facteur 3 -->
+      <div class="factor-block hidden" id="factor3">
+        <h4>
+          Facteur 3 : Individuel
+          <span class="info-icon-container">
+            <span class="info-icon">i</span>
+            <span class="tooltip-text">
+              Les facteurs individuels renvoient aux traits de personnalité, 
+              propension à l’immersion, troubles psychologiques, etc.
+            </span>
+          </span>
+        </h4>
+        <div>
+          <p><strong>Quel est votre ressenti ?</strong></p>
+          <textarea id="facteur3_ressenti" oninput="checkFactorCompletion(3); saveResponses()"></textarea>
+        </div>
+        <div>
+          <p><strong>Qu'est-ce qu'on pourrait améliorer ?</strong></p>
+          <textarea id="facteur3_ameliorer" oninput="checkFactorCompletion(3); saveResponses()"></textarea>
+        </div>
+        <div>
+          <p><strong>Quelle(s) composante(s) pourraient être impactées ?</strong></p>
+          <p>Choisissez l'une des <span style="color:green;">cartes vertes</span> (à droite)...</p>
+          <div class="cards-zone" id="factor3-cards">
+            <div class="card-container">
+              <div class="remove-card" onclick="removeCard(this)">x</div>
+              <div class="drop-zone" ondragover="onDragOver(event)" ondrop="onDrop(event, 3)" data-value="">
+                <span>Glissez une composante ici</span>
+              </div>
+              <p><strong>Commentaire :</strong></p>
+              <textarea class="commentaire" oninput="checkFactorCompletion(3); saveResponses()"></textarea>
+            </div>
+          </div>
+          <button onclick="addCard('factor3-cards', 3)">+ Ajouter un encadré</button>
+        </div>
+      </div>
+
+      <button class="hidden" id="saveFactorBtn" onclick="completeModule1()">
+        Enregistrer et revenir aux modules
+      </button>
+    </div>
+
+    <!-- MODULE 2 : Correction -->
+    <div id="module2" class="hidden">
+      <h3>Correction</h3>
+      <p style="text-align:left;">
+        Vous trouverez ci-dessous les 3 facteurs, leurs définitions, 
+        et une carte à révéler pour chaque exemple d'amélioration.
+      </p>
+
+      <div class="container" style="background:#fafafa; text-align:left; margin-top:20px;">
+        <h4>Facteur technologique</h4>
+        <p>
+          <em>
+          Les facteurs technologiques renvoient à tout ce qui concerne le matériel 
+          (forme du média, enveloppement…) et l’interaction (aspect naturel, contrôle, interface).
+          </em>
+        </p>
+        <div class="purple-card" onclick="revealCard('card1')">Révéler une idée</div>
+        <div id="card1" class="revealed-content hidden">
+          Amélioration de la spatialisation des sons → amélioration du modèle mental.
+        </div>
+      </div>
+
+      <div class="container" style="background:#fafafa; text-align:left; margin-top:20px;">
+        <h4>Facteur environnemental</h4>
+        <p>
+          <em>
+          Les facteurs environnementaux renvoient à la cohérence/réalisme de l’environnement, 
+          la narration, la tâche, la difficulté, etc.
+          </em>
+        </p>
+        <div class="purple-card" onclick="revealCard('card2')">Révéler une idée</div>
+        <div id="card2" class="revealed-content hidden">
+          Ajout d'une narration introductive → augmentation du jugement de crédibilité (attentes).
+        </div>
+      </div>
+
+      <div class="container" style="background:#fafafa; text-align:left; margin-top:20px;">
+        <h4>Facteur individuel</h4>
+        <p>
+          <em>
+          Les facteurs individuels renvoient aux traits de personnalité, 
+          troubles psychologiques, capacités cognitives, intérêts, etc.
+          </em>
+        </p>
+        <div class="purple-card" onclick="revealCard('card3')">Révéler une idée</div>
+        <div id="card3" class="revealed-content hidden">
+          S'adapter aux intérêts → augmenter les émotions.
+        </div>
+      </div>
+
+      <button onclick="showStep('steps')">Enregistrer et revenir au menu</button>
+    </div>
+  </div>
+
+  <!-- 5) ÉTAPE 3 : GROS ENCADRÉ VIOLET, CARTES D'IDÉES, CHAMP TEXTE -->
+  <div class="container hidden" id="step3">
+    <h2>Étape 3 : Récap</h2>
+    <p>Ci-dessous un grand encadré violet avec des idées à révéler et un champ texte pour vos notes.</p>
+
+    <div class="big-violet-box">
+      <h3>Vos Idées</h3>
+      <!-- Cartes d'idées -->
+      <div class="idea-card" onclick="toggleIdea('ideaA')">Révéler l'idée A</div>
+      <div id="ideaA" class="idea-hidden">
+        <strong>Idée A :</strong> Un exemple de bonne pratique, ou un rappel important.
+      </div>
+
+      <div class="idea-card" onclick="toggleIdea('ideaB')">Révéler l'idée B</div>
+      <div id="ideaB" class="idea-hidden">
+        <strong>Idée B :</strong> Un deuxième exemple d'astuce ou recommandation.
+      </div>
+
+      <div class="idea-card" onclick="toggleIdea('ideaC')">Révéler l'idée C</div>
+      <div id="ideaC" class="idea-hidden">
+        <strong>Idée C :</strong> Encore une suggestion qui pourrait être utile.
+      </div>
+
+      <!-- Champ texte libre pour noter ses propres idées -->
+      <h4 style="margin-top: 20px;">Notez vos propres idées :</h4>
+      <textarea id="step3_notes" rows="4" placeholder="Saisissez ici vos réflexions supplémentaires..."></textarea>
+    </div>
+
+    <button onclick="showStep('steps')">Revenir au menu</button>
+  </div>
+
+  <!-- 6) CARTES VERTES (Étape 2 - Module 1) => plus petites -->
+  <div class="tags-panel hidden" id="tagsPanel">
+    <!-- 1) Présence de soi -->
+    <div class="playing-card" draggable="true" ondragstart="onDragStart(event)" data-value="Présence de soi">
+      <div class="card-title">Présence de soi</div>
+      <div class="card-body">
+        Correspond au sentiment subjectif d'être physiquement présent 
+        et d'avoir une représentation mentale de son propre corps 
+        dans un environnement immersif.<br/><br/>
+        Elle repose sur :
+        <ul>
+          <li>l'incarnation</li>
+          <li>l'agentivité</li>
+          <li>les possibilités d'action/interaction</li>
+        </ul>
+      </div>
+    </div>
+    <!-- 2) Modèle mental -->
+    <div class="playing-card" draggable="true" ondragstart="onDragStart(event)" data-value="Modèle mental">
+      <div class="card-title">Modèle mental</div>
+      <div class="card-body">
+        Désigne la manière dont une personne construit et organise 
+        une représentation cognitive pouvant être multisensorielle, 
+        à partir des informations perçues.<br/><br/>
+        Il comprend plusieurs niveaux :
+        <ul>
+          <li>l'imagerie simple</li>
+          <li>l'imagerie complexe</li>
+          <li>l'imagerie fonctionnelle</li>
+        </ul>
+      </div>
+    </div>
+    <!-- 3) Émotion -->
+    <div class="playing-card" draggable="true" ondragstart="onDragStart(event)" data-value="Émotion">
+      <div class="card-title">Émotion</div>
+      <div class="card-body">
+        Fait référence aux réponses affectives de courte durée 
+        déclenchées par une situation et leur influence sur 
+        l'expérience vécue.<br/><br/>
+        Elles reposent sur :
+        <ul>
+          <li>L'intensité et la valence</li>
+          <li>La motivation émotionnelle</li>
+        </ul>
+      </div>
+    </div>
+    <!-- 4) Jugement -->
+    <div class="playing-card" draggable="true" ondragstart="onDragStart(event)" data-value="Jugement">
+      <div class="card-title">Jugement</div>
+      <div class="card-body">
+        Ce facteur correspond à l'évaluation subjective de la crédibilité 
+        de l'environnement immersif basée sur sa cohérence, 
+        nos connaissances et nos attentes personnelles.<br/><br/>
+        Il repose sur :
+        <ul>
+          <li>La cohérence</li>
+          <li>La correspondance aux attentes antérieures</li>
+        </ul>
+      </div>
+    </div>
+    <!-- 5) Implication -->
+    <div class="playing-card" draggable="true" ondragstart="onDragStart(event)" data-value="Implication">
+      <div class="card-title">Implication</div>
+      <div class="card-body">
+        Elle renvoie à l'attention portée à une expérience, 
+        ainsi qu'à la perception du temps et au degré d'investissement 
+        mental dans l'environnement immersif par rapport à l'environnement réel.<br/><br/>
+        Elle se manifeste par :
+        <ul>
+          <li>Une concentration attentionnelle</li>
+          <li>Un indiçage de la pensée</li>
+          <li>Une non conscience du temps</li>
+        </ul>
+      </div>
+    </div>
+    <!-- 6) Suspension -->
+    <div class="playing-card" draggable="true" ondragstart="onDragStart(event)" data-value="Suspension de l'incrédulité">
+      <div class="card-title">Suspension de l'incrédulité</div>
+      <div class="card-body">
+        Désigne la volonté d'un individu à accepter l'environnement immersif 
+        comme réel, en faisant abstraction des incohérences 
+        ou des éléments qui pourraient en briser l'illusion.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /************************************************************
+     * 1) DEMANDE DE L'EMAIL                                   *
+     ************************************************************/
+    function saveEmail() {
+      const emailInput = document.getElementById("userEmail").value.trim();
+      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if(!regex.test(emailInput)) {
+        alert("Veuillez saisir un email valide avant de continuer.");
+        return;
+      }
+      localStorage.setItem("userEmail", emailInput);
+
+      // On masque la section email et on affiche le menu
+      document.getElementById("emailSection").classList.add("hidden");
+      document.getElementById("steps").classList.remove("hidden");
+
+      // On débloque l'Étape 1
+      const step1Btn = document.getElementById("step1-btn");
+      step1Btn.classList.remove("disabled");
+      step1Btn.disabled = false;
+      step1Btn.innerText = "Étape 1 : Analyse Critique";
+    }
+
+    /************************************************************
+     * 2) AFFICHER / MASQUER UNE ÉTAPE                         *
+     ************************************************************/
+    function showStep(stepId) {
+      document.querySelectorAll(".container").forEach(el => el.classList.add("hidden"));
+      // Masquer le panneau de cartes
+      document.getElementById("tagsPanel").classList.add("hidden");
+
+      if(stepId) {
+        document.getElementById(stepId).classList.remove("hidden");
+      }
+    }
+
+    /************************************************************
+     * 3) AFFICHER / MASQUER LES MODULES (Facteurs/Correction)  *
+     ************************************************************/
+    function showModule(moduleId) {
+      document.getElementById("module1").classList.add("hidden");
+      document.getElementById("module2").classList.add("hidden");
+      // Pas de cartes vertes en Module 2
+      document.getElementById("tagsPanel").classList.add("hidden");
+
+      if(moduleId === "module1") {
+        document.getElementById("module1").classList.remove("hidden");
+        document.getElementById("tagsPanel").classList.remove("hidden");
+      }
+      else if(moduleId === "module2") {
+        document.getElementById("module2").classList.remove("hidden");
+      }
+    }
+
+    /************************************************************
+     * 4) ÉTAPE 1 : checkAndShowNext, enableStep2               *
+     ************************************************************/
+    function checkAndShowNext(currentId, nextId) {
+      const question = document.getElementById("question" + currentId);
+      if(!question) return;
+      const textarea = question.querySelector("textarea");
+      if(textarea && textarea.value.trim() !== "") {
+        const nextQuestion = document.getElementById("question" + nextId);
+        if(nextQuestion) {
+          nextQuestion.classList.remove("hidden");
+        }
+      }
+    }
+    function enableStep2() {
+      document.getElementById("saveBtn").classList.remove("hidden");
+      const step2Btn = document.getElementById("step2-btn");
+      step2Btn.classList.remove("disabled");
+      step2Btn.disabled = false;
+      step2Btn.innerText = "Étape 2 : Facteurs à modifier";
+
+      // On peut débloquer le bouton "module1" (Facteurs)
+      const module1Btn = document.getElementById("module1-btn");
+      module1Btn.classList.remove("disabled");
+      module1Btn.disabled = false;
+      module1Btn.innerText = "Facteurs";
+    }
+
+    /************************************************************
+     * 5) SAUVEGARDE DES RÉPONSES (optionnel)                   *
+     ************************************************************/
+    function saveResponses() {
+      // À implémenter si nécessaire
+    }
+
+    /************************************************************
+     * 6) CHECK FACTOR COMPLETION                               *
+     ************************************************************/
+    function checkFactorCompletion(factorNum) {
+      const ressenti = document.getElementById(`facteur${factorNum}_ressenti`).value.trim();
+      const ameliorer = document.getElementById(`facteur${factorNum}_ameliorer`).value.trim();
+
+      let hasValidCard = false;
+      const cardZone = document.getElementById(`factor${factorNum}-cards`);
+      if(!cardZone) return;
+
+      const cards = cardZone.querySelectorAll(".card-container");
+      cards.forEach(card => {
+        const dropZone = card.querySelector(".drop-zone");
+        const comment  = card.querySelector(".commentaire");
+        if(dropZone && comment) {
+          const compVal = dropZone.getAttribute("data-value") || "";
+          const commVal = comment.value.trim();
+          if(compVal !== "" && commVal !== "") {
+            hasValidCard = true;
+          }
+        }
+      });
+
+      if(ressenti !== "" && ameliorer !== "" && hasValidCard) {
+        const nextFactor = document.getElementById(`factor${factorNum + 1}`);
+        if(nextFactor) {
+          nextFactor.classList.remove("hidden");
+        } else {
+          // dernier => bouton final
+          document.getElementById("saveFactorBtn").classList.remove("hidden");
+        }
+      }
+    }
+
+    /************************************************************
+     * 7) DRAG & DROP                                           *
+     ************************************************************/
+    let draggedTag = null;
+    function onDragStart(event) {
+      draggedTag = event.target; 
+    }
+    function onDragOver(event) {
+      event.preventDefault();
+    }
+    function onDrop(event, factorNum) {
+      event.preventDefault();
+      if(!draggedTag) return;
+
+      const dropZone = event.currentTarget;
+      const composante = draggedTag.getAttribute("data-value") || "";
+      dropZone.innerHTML = composante;
+      dropZone.classList.add("filled");
+      dropZone.setAttribute("data-value", composante);
+
+      saveResponses();
+      checkFactorCompletion(factorNum);
+    }
+
+    function addCard(containerId, factorNum) {
+      const container = document.getElementById(containerId);
+      if(!container) return;
+
+      const existingCards = container.querySelectorAll(".card-container").length;
+      if(existingCards >= 4) {
+        alert("Vous ne pouvez pas créer plus de 4 encadrés pour ce facteur.");
+        return;
+      }
+
+      const card = document.createElement("div");
+      card.classList.add("card-container");
+      card.innerHTML = `
+        <div class="remove-card" onclick="removeCard(this)">x</div>
+        <div class="drop-zone" ondragover="onDragOver(event)" ondrop="onDrop(event, ${factorNum})" data-value="">
+          <span>Glissez une composante ici</span>
+        </div>
+        <p><strong>Commentaire :</strong></p>
+        <textarea class="commentaire" oninput="checkFactorCompletion(${factorNum}); saveResponses()"></textarea>
+      `;
+      container.appendChild(card);
+      saveResponses();
+    }
+
+    function removeCard(elem) {
+      const card = elem.parentElement;
+      card.remove();
+      saveResponses();
+    }
+
+    /************************************************************
+     * 8) MODULE 1 FIN => débloquer MODULE 2                    *
+     ************************************************************/
+    function completeModule1() {
+      const module1Btn = document.getElementById("module1-btn");
+      module1Btn.classList.add("done");
+      const module2Btn = document.getElementById("module2-btn");
+      module2Btn.classList.remove("disabled");
+      module2Btn.disabled = false;
+      module2Btn.innerText = "Correction";
+
+      showModule('');
+      saveResponses();
+    }
+
+    /************************************************************
+     * 9) MODULE 2 : révéler la carte                          *
+     ************************************************************/
+    function revealCard(cardId) {
+      const card = document.getElementById(cardId);
+      if(card.classList.contains("hidden")) {
+        card.classList.remove("hidden");
+      }
+    }
+
+    /************************************************************
+     * 10) ÉTAPE 3 : toggler les "idées à révéler"              *
+     ************************************************************/
+    function toggleIdea(ideaId) {
+      const ideaDiv = document.getElementById(ideaId);
+      if(ideaDiv) {
+        if(ideaDiv.style.display === "none" || ideaDiv.style.display === "") {
+          ideaDiv.style.display = "block";
+        } else {
+          ideaDiv.style.display = "none";
+        }
+      }
+    }
+  </script>
+</body>
+</html>
